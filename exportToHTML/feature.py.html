@@ -1,0 +1,511 @@
+<html>
+<head>
+<title>feature.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #bcbec4;}
+.s3 { color: #7a7e85;}
+.s4 { color: #6aab73;}
+.s5 { color: #2aacb8;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+feature.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">ipaddress</span>
+<span class="s0">import </span><span class="s1">re</span>
+<span class="s0">import </span><span class="s1">urllib</span><span class="s2">.</span><span class="s1">request</span>
+<span class="s0">from </span><span class="s1">bs4 </span><span class="s0">import </span><span class="s1">BeautifulSoup</span>
+<span class="s0">import </span><span class="s1">socket</span>
+<span class="s0">import </span><span class="s1">requests</span>
+<span class="s3"># from googlesearch import search</span>
+<span class="s0">import </span><span class="s1">whois</span>
+<span class="s0">from </span><span class="s1">datetime </span><span class="s0">import </span><span class="s1">date</span><span class="s2">, </span><span class="s1">datetime</span>
+<span class="s0">import </span><span class="s1">time</span>
+<span class="s0">from </span><span class="s1">dateutil</span><span class="s2">.</span><span class="s1">parser </span><span class="s0">import </span><span class="s1">parse </span><span class="s0">as </span><span class="s1">date_parse</span>
+<span class="s0">from </span><span class="s1">urllib</span><span class="s2">.</span><span class="s1">parse </span><span class="s0">import </span><span class="s1">urlparse</span>
+
+<span class="s0">class </span><span class="s1">FeatureExtraction</span><span class="s2">:</span>
+    <span class="s1">features </span><span class="s2">= []</span>
+    <span class="s0">def </span><span class="s1">__init__</span><span class="s2">(</span><span class="s1">self</span><span class="s2">,</span><span class="s1">url</span><span class="s2">):</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features </span><span class="s2">= []</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">url </span><span class="s2">= </span><span class="s1">url</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">domain </span><span class="s2">= </span><span class="s4">&quot;&quot;</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">whois_response </span><span class="s2">= </span><span class="s4">&quot;&quot;</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">urlparse </span><span class="s2">= </span><span class="s4">&quot;&quot;</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">response </span><span class="s2">= </span><span class="s4">&quot;&quot;</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">soup </span><span class="s2">= </span><span class="s4">&quot;&quot;</span>
+
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s1">self</span><span class="s2">.</span><span class="s1">response </span><span class="s2">= </span><span class="s1">requests</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s1">url</span><span class="s2">)</span>
+            <span class="s1">self</span><span class="s2">.</span><span class="s1">soup </span><span class="s2">= </span><span class="s1">BeautifulSoup</span><span class="s2">(</span><span class="s1">response</span><span class="s2">.</span><span class="s1">text</span><span class="s2">, </span><span class="s4">'html.parser'</span><span class="s2">)</span>
+        <span class="s0">except</span><span class="s2">:</span>
+            <span class="s0">pass</span>
+
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s1">self</span><span class="s2">.</span><span class="s1">urlparse </span><span class="s2">= </span><span class="s1">urlparse</span><span class="s2">(</span><span class="s1">url</span><span class="s2">)</span>
+            <span class="s1">self</span><span class="s2">.</span><span class="s1">domain </span><span class="s2">= </span><span class="s1">self</span><span class="s2">.</span><span class="s1">urlparse</span><span class="s2">.</span><span class="s1">netloc</span>
+        <span class="s0">except</span><span class="s2">:</span>
+            <span class="s0">pass</span>
+
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s1">self</span><span class="s2">.</span><span class="s1">whois_response </span><span class="s2">= </span><span class="s1">whois</span><span class="s2">.</span><span class="s1">whois</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">domain</span><span class="s2">)</span>
+        <span class="s0">except</span><span class="s2">:</span>
+            <span class="s0">pass</span>
+
+
+        
+
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">UsingIp</span><span class="s2">())</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">longUrl</span><span class="s2">())</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">shortUrl</span><span class="s2">())</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">symbol</span><span class="s2">())</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">redirecting</span><span class="s2">())</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">prefixSuffix</span><span class="s2">())</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">SubDomains</span><span class="s2">())</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">Hppts</span><span class="s2">())</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">DomainRegLen</span><span class="s2">())</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">Favicon</span><span class="s2">())</span>
+        
+
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">NonStdPort</span><span class="s2">())</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">HTTPSDomainURL</span><span class="s2">())</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">RequestURL</span><span class="s2">())</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">AnchorURL</span><span class="s2">())</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">LinksInScriptTags</span><span class="s2">())</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">ServerFormHandler</span><span class="s2">())</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">InfoEmail</span><span class="s2">())</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">AbnormalURL</span><span class="s2">())</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">WebsiteForwarding</span><span class="s2">())</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">StatusBarCust</span><span class="s2">())</span>
+
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">DisableRightClick</span><span class="s2">())</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">UsingPopupWindow</span><span class="s2">())</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">IframeRedirection</span><span class="s2">())</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">AgeofDomain</span><span class="s2">())</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">DNSRecording</span><span class="s2">())</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">WebsiteTraffic</span><span class="s2">())</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">PageRank</span><span class="s2">())</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">GoogleIndex</span><span class="s2">())</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">LinksPointingToPage</span><span class="s2">())</span>
+        <span class="s1">self</span><span class="s2">.</span><span class="s1">features</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">StatsReport</span><span class="s2">())</span>
+
+
+     <span class="s3"># 1.UsingIp</span>
+    <span class="s0">def </span><span class="s1">UsingIp</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s1">ipaddress</span><span class="s2">.</span><span class="s1">ip_address</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">url</span><span class="s2">)</span>
+            <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+        <span class="s0">except</span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s5">1</span>
+
+    <span class="s3"># 2.longUrl</span>
+    <span class="s0">def </span><span class="s1">longUrl</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s0">if </span><span class="s1">len</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">url</span><span class="s2">) &lt; </span><span class="s5">54</span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s5">1</span>
+        <span class="s0">if </span><span class="s1">len</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">url</span><span class="s2">) &gt;= </span><span class="s5">54 </span><span class="s0">and </span><span class="s1">len</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">url</span><span class="s2">) &lt;= </span><span class="s5">75</span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s5">0</span>
+        <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+
+    <span class="s3"># 3.shortUrl</span>
+    <span class="s0">def </span><span class="s1">shortUrl</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s1">match </span><span class="s2">= </span><span class="s1">re</span><span class="s2">.</span><span class="s1">search</span><span class="s2">(</span><span class="s4">'bit\.ly|goo\.gl|shorte\.st|go2l\.ink|x\.co|ow\.ly|t\.co|tinyurl|tr\.im|is\.gd|cli\.gs|'</span>
+                    <span class="s4">'yfrog\.com|migre\.me|ff\.im|tiny\.cc|url4\.eu|twit\.ac|su\.pr|twurl\.nl|snipurl\.com|'</span>
+                    <span class="s4">'short\.to|BudURL\.com|ping\.fm|post\.ly|Just\.as|bkite\.com|snipr\.com|fic\.kr|loopt\.us|'</span>
+                    <span class="s4">'doiop\.com|short\.ie|kl\.am|wp\.me|rubyurl\.com|om\.ly|to\.ly|bit\.do|t\.co|lnkd\.in|'</span>
+                    <span class="s4">'db\.tt|qr\.ae|adf\.ly|goo\.gl|bitly\.com|cur\.lv|tinyurl\.com|ow\.ly|bit\.ly|ity\.im|'</span>
+                    <span class="s4">'q\.gs|is\.gd|po\.st|bc\.vc|twitthis\.com|u\.to|j\.mp|buzurl\.com|cutt\.us|u\.bb|yourls\.org|'</span>
+                    <span class="s4">'x\.co|prettylinkpro\.com|scrnch\.me|filoops\.info|vzturl\.com|qr\.net|1url\.com|tweez\.me|v\.gd|tr\.im|link\.zip\.net'</span><span class="s2">, </span><span class="s1">self</span><span class="s2">.</span><span class="s1">url</span><span class="s2">)</span>
+        <span class="s0">if </span><span class="s1">match</span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+        <span class="s0">return </span><span class="s5">1</span>
+
+    <span class="s3"># 4.Symbol@</span>
+    <span class="s0">def </span><span class="s1">symbol</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s0">if </span><span class="s1">re</span><span class="s2">.</span><span class="s1">findall</span><span class="s2">(</span><span class="s4">&quot;@&quot;</span><span class="s2">,</span><span class="s1">self</span><span class="s2">.</span><span class="s1">url</span><span class="s2">):</span>
+            <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+        <span class="s0">return </span><span class="s5">1</span>
+    
+    <span class="s3"># 5.Redirecting//</span>
+    <span class="s0">def </span><span class="s1">redirecting</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s0">if </span><span class="s1">self</span><span class="s2">.</span><span class="s1">url</span><span class="s2">.</span><span class="s1">rfind</span><span class="s2">(</span><span class="s4">'//'</span><span class="s2">)&gt;</span><span class="s5">6</span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+        <span class="s0">return </span><span class="s5">1</span>
+    
+    <span class="s3"># 6.prefixSuffix</span>
+    <span class="s0">def </span><span class="s1">prefixSuffix</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s1">match </span><span class="s2">= </span><span class="s1">re</span><span class="s2">.</span><span class="s1">findall</span><span class="s2">(</span><span class="s4">'\-'</span><span class="s2">, </span><span class="s1">self</span><span class="s2">.</span><span class="s1">domain</span><span class="s2">)</span>
+            <span class="s0">if </span><span class="s1">match</span><span class="s2">:</span>
+                <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+            <span class="s0">return </span><span class="s5">1</span>
+        <span class="s0">except</span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+    
+    <span class="s3"># 7.SubDomains</span>
+    <span class="s0">def </span><span class="s1">SubDomains</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s1">dot_count </span><span class="s2">= </span><span class="s1">len</span><span class="s2">(</span><span class="s1">re</span><span class="s2">.</span><span class="s1">findall</span><span class="s2">(</span><span class="s4">&quot;\.&quot;</span><span class="s2">, </span><span class="s1">self</span><span class="s2">.</span><span class="s1">url</span><span class="s2">))</span>
+        <span class="s0">if </span><span class="s1">dot_count </span><span class="s2">== </span><span class="s5">1</span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s5">1</span>
+        <span class="s0">elif </span><span class="s1">dot_count </span><span class="s2">== </span><span class="s5">2</span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s5">0</span>
+        <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+
+    <span class="s3"># 8.HTTPS</span>
+    <span class="s0">def </span><span class="s1">Hppts</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s1">https </span><span class="s2">= </span><span class="s1">self</span><span class="s2">.</span><span class="s1">urlparse</span><span class="s2">.</span><span class="s1">scheme</span>
+            <span class="s0">if </span><span class="s4">'https' </span><span class="s0">in </span><span class="s1">https</span><span class="s2">:</span>
+                <span class="s0">return </span><span class="s5">1</span>
+            <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+        <span class="s0">except</span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s5">1</span>
+
+    <span class="s3"># 9.DomainRegLen</span>
+    <span class="s0">def </span><span class="s1">DomainRegLen</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s1">expiration_date </span><span class="s2">= </span><span class="s1">self</span><span class="s2">.</span><span class="s1">whois_response</span><span class="s2">.</span><span class="s1">expiration_date</span>
+            <span class="s1">creation_date </span><span class="s2">= </span><span class="s1">self</span><span class="s2">.</span><span class="s1">whois_response</span><span class="s2">.</span><span class="s1">creation_date</span>
+            <span class="s0">try</span><span class="s2">:</span>
+                <span class="s0">if</span><span class="s2">(</span><span class="s1">len</span><span class="s2">(</span><span class="s1">expiration_date</span><span class="s2">)):</span>
+                    <span class="s1">expiration_date </span><span class="s2">= </span><span class="s1">expiration_date</span><span class="s2">[</span><span class="s5">0</span><span class="s2">]</span>
+            <span class="s0">except</span><span class="s2">:</span>
+                <span class="s0">pass</span>
+            <span class="s0">try</span><span class="s2">:</span>
+                <span class="s0">if</span><span class="s2">(</span><span class="s1">len</span><span class="s2">(</span><span class="s1">creation_date</span><span class="s2">)):</span>
+                    <span class="s1">creation_date </span><span class="s2">= </span><span class="s1">creation_date</span><span class="s2">[</span><span class="s5">0</span><span class="s2">]</span>
+            <span class="s0">except</span><span class="s2">:</span>
+                <span class="s0">pass</span>
+
+            <span class="s1">age </span><span class="s2">= (</span><span class="s1">expiration_date</span><span class="s2">.</span><span class="s1">year</span><span class="s2">-</span><span class="s1">creation_date</span><span class="s2">.</span><span class="s1">year</span><span class="s2">)*</span><span class="s5">12</span><span class="s2">+ (</span><span class="s1">expiration_date</span><span class="s2">.</span><span class="s1">month</span><span class="s2">-</span><span class="s1">creation_date</span><span class="s2">.</span><span class="s1">month</span><span class="s2">)</span>
+            <span class="s0">if </span><span class="s1">age </span><span class="s2">&gt;=</span><span class="s5">12</span><span class="s2">:</span>
+                <span class="s0">return </span><span class="s5">1</span>
+            <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+        <span class="s0">except</span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+
+    <span class="s3"># 10. Favicon</span>
+    <span class="s0">def </span><span class="s1">Favicon</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s0">for </span><span class="s1">head </span><span class="s0">in </span><span class="s1">self</span><span class="s2">.</span><span class="s1">soup</span><span class="s2">.</span><span class="s1">find_all</span><span class="s2">(</span><span class="s4">'head'</span><span class="s2">):</span>
+                <span class="s0">for </span><span class="s1">head</span><span class="s2">.</span><span class="s1">link </span><span class="s0">in </span><span class="s1">self</span><span class="s2">.</span><span class="s1">soup</span><span class="s2">.</span><span class="s1">find_all</span><span class="s2">(</span><span class="s4">'link'</span><span class="s2">, </span><span class="s1">href</span><span class="s2">=</span><span class="s0">True</span><span class="s2">):</span>
+                    <span class="s1">dots </span><span class="s2">= [</span><span class="s1">x</span><span class="s2">.</span><span class="s1">start</span><span class="s2">(</span><span class="s5">0</span><span class="s2">) </span><span class="s0">for </span><span class="s1">x </span><span class="s0">in </span><span class="s1">re</span><span class="s2">.</span><span class="s1">finditer</span><span class="s2">(</span><span class="s4">'\.'</span><span class="s2">, </span><span class="s1">head</span><span class="s2">.</span><span class="s1">link</span><span class="s2">[</span><span class="s4">'href'</span><span class="s2">])]</span>
+                    <span class="s0">if </span><span class="s1">self</span><span class="s2">.</span><span class="s1">url </span><span class="s0">in </span><span class="s1">head</span><span class="s2">.</span><span class="s1">link</span><span class="s2">[</span><span class="s4">'href'</span><span class="s2">] </span><span class="s0">or </span><span class="s1">len</span><span class="s2">(</span><span class="s1">dots</span><span class="s2">) == </span><span class="s5">1 </span><span class="s0">or </span><span class="s1">domain </span><span class="s0">in </span><span class="s1">head</span><span class="s2">.</span><span class="s1">link</span><span class="s2">[</span><span class="s4">'href'</span><span class="s2">]:</span>
+                        <span class="s0">return </span><span class="s5">1</span>
+            <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+        <span class="s0">except</span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+
+    <span class="s3"># 11. NonStdPort</span>
+    <span class="s0">def </span><span class="s1">NonStdPort</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s1">port </span><span class="s2">= </span><span class="s1">self</span><span class="s2">.</span><span class="s1">domain</span><span class="s2">.</span><span class="s1">split</span><span class="s2">(</span><span class="s4">&quot;:&quot;</span><span class="s2">)</span>
+            <span class="s0">if </span><span class="s1">len</span><span class="s2">(</span><span class="s1">port</span><span class="s2">)&gt;</span><span class="s5">1</span><span class="s2">:</span>
+                <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+            <span class="s0">return </span><span class="s5">1</span>
+        <span class="s0">except</span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+
+    <span class="s3"># 12. HTTPSDomainURL</span>
+    <span class="s0">def </span><span class="s1">HTTPSDomainURL</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s0">if </span><span class="s4">'https' </span><span class="s0">in </span><span class="s1">self</span><span class="s2">.</span><span class="s1">domain</span><span class="s2">:</span>
+                <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+            <span class="s0">return </span><span class="s5">1</span>
+        <span class="s0">except</span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+    
+    <span class="s3"># 13. RequestURL</span>
+    <span class="s0">def </span><span class="s1">RequestURL</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s0">for </span><span class="s1">img </span><span class="s0">in </span><span class="s1">self</span><span class="s2">.</span><span class="s1">soup</span><span class="s2">.</span><span class="s1">find_all</span><span class="s2">(</span><span class="s4">'img'</span><span class="s2">, </span><span class="s1">src</span><span class="s2">=</span><span class="s0">True</span><span class="s2">):</span>
+                <span class="s1">dots </span><span class="s2">= [</span><span class="s1">x</span><span class="s2">.</span><span class="s1">start</span><span class="s2">(</span><span class="s5">0</span><span class="s2">) </span><span class="s0">for </span><span class="s1">x </span><span class="s0">in </span><span class="s1">re</span><span class="s2">.</span><span class="s1">finditer</span><span class="s2">(</span><span class="s4">'\.'</span><span class="s2">, </span><span class="s1">img</span><span class="s2">[</span><span class="s4">'src'</span><span class="s2">])]</span>
+                <span class="s0">if </span><span class="s1">self</span><span class="s2">.</span><span class="s1">url </span><span class="s0">in </span><span class="s1">img</span><span class="s2">[</span><span class="s4">'src'</span><span class="s2">] </span><span class="s0">or </span><span class="s1">self</span><span class="s2">.</span><span class="s1">domain </span><span class="s0">in </span><span class="s1">img</span><span class="s2">[</span><span class="s4">'src'</span><span class="s2">] </span><span class="s0">or </span><span class="s1">len</span><span class="s2">(</span><span class="s1">dots</span><span class="s2">) == </span><span class="s5">1</span><span class="s2">:</span>
+                    <span class="s1">success </span><span class="s2">= </span><span class="s1">success </span><span class="s2">+ </span><span class="s5">1</span>
+                <span class="s1">i </span><span class="s2">= </span><span class="s1">i</span><span class="s2">+</span><span class="s5">1</span>
+
+            <span class="s0">for </span><span class="s1">audio </span><span class="s0">in </span><span class="s1">self</span><span class="s2">.</span><span class="s1">soup</span><span class="s2">.</span><span class="s1">find_all</span><span class="s2">(</span><span class="s4">'audio'</span><span class="s2">, </span><span class="s1">src</span><span class="s2">=</span><span class="s0">True</span><span class="s2">):</span>
+                <span class="s1">dots </span><span class="s2">= [</span><span class="s1">x</span><span class="s2">.</span><span class="s1">start</span><span class="s2">(</span><span class="s5">0</span><span class="s2">) </span><span class="s0">for </span><span class="s1">x </span><span class="s0">in </span><span class="s1">re</span><span class="s2">.</span><span class="s1">finditer</span><span class="s2">(</span><span class="s4">'\.'</span><span class="s2">, </span><span class="s1">audio</span><span class="s2">[</span><span class="s4">'src'</span><span class="s2">])]</span>
+                <span class="s0">if </span><span class="s1">self</span><span class="s2">.</span><span class="s1">url </span><span class="s0">in </span><span class="s1">audio</span><span class="s2">[</span><span class="s4">'src'</span><span class="s2">] </span><span class="s0">or </span><span class="s1">self</span><span class="s2">.</span><span class="s1">domain </span><span class="s0">in </span><span class="s1">audio</span><span class="s2">[</span><span class="s4">'src'</span><span class="s2">] </span><span class="s0">or </span><span class="s1">len</span><span class="s2">(</span><span class="s1">dots</span><span class="s2">) == </span><span class="s5">1</span><span class="s2">:</span>
+                    <span class="s1">success </span><span class="s2">= </span><span class="s1">success </span><span class="s2">+ </span><span class="s5">1</span>
+                <span class="s1">i </span><span class="s2">= </span><span class="s1">i</span><span class="s2">+</span><span class="s5">1</span>
+
+            <span class="s0">for </span><span class="s1">embed </span><span class="s0">in </span><span class="s1">self</span><span class="s2">.</span><span class="s1">soup</span><span class="s2">.</span><span class="s1">find_all</span><span class="s2">(</span><span class="s4">'embed'</span><span class="s2">, </span><span class="s1">src</span><span class="s2">=</span><span class="s0">True</span><span class="s2">):</span>
+                <span class="s1">dots </span><span class="s2">= [</span><span class="s1">x</span><span class="s2">.</span><span class="s1">start</span><span class="s2">(</span><span class="s5">0</span><span class="s2">) </span><span class="s0">for </span><span class="s1">x </span><span class="s0">in </span><span class="s1">re</span><span class="s2">.</span><span class="s1">finditer</span><span class="s2">(</span><span class="s4">'\.'</span><span class="s2">, </span><span class="s1">embed</span><span class="s2">[</span><span class="s4">'src'</span><span class="s2">])]</span>
+                <span class="s0">if </span><span class="s1">self</span><span class="s2">.</span><span class="s1">url </span><span class="s0">in </span><span class="s1">embed</span><span class="s2">[</span><span class="s4">'src'</span><span class="s2">] </span><span class="s0">or </span><span class="s1">self</span><span class="s2">.</span><span class="s1">domain </span><span class="s0">in </span><span class="s1">embed</span><span class="s2">[</span><span class="s4">'src'</span><span class="s2">] </span><span class="s0">or </span><span class="s1">len</span><span class="s2">(</span><span class="s1">dots</span><span class="s2">) == </span><span class="s5">1</span><span class="s2">:</span>
+                    <span class="s1">success </span><span class="s2">= </span><span class="s1">success </span><span class="s2">+ </span><span class="s5">1</span>
+                <span class="s1">i </span><span class="s2">= </span><span class="s1">i</span><span class="s2">+</span><span class="s5">1</span>
+
+            <span class="s0">for </span><span class="s1">iframe </span><span class="s0">in </span><span class="s1">self</span><span class="s2">.</span><span class="s1">soup</span><span class="s2">.</span><span class="s1">find_all</span><span class="s2">(</span><span class="s4">'iframe'</span><span class="s2">, </span><span class="s1">src</span><span class="s2">=</span><span class="s0">True</span><span class="s2">):</span>
+                <span class="s1">dots </span><span class="s2">= [</span><span class="s1">x</span><span class="s2">.</span><span class="s1">start</span><span class="s2">(</span><span class="s5">0</span><span class="s2">) </span><span class="s0">for </span><span class="s1">x </span><span class="s0">in </span><span class="s1">re</span><span class="s2">.</span><span class="s1">finditer</span><span class="s2">(</span><span class="s4">'\.'</span><span class="s2">, </span><span class="s1">iframe</span><span class="s2">[</span><span class="s4">'src'</span><span class="s2">])]</span>
+                <span class="s0">if </span><span class="s1">self</span><span class="s2">.</span><span class="s1">url </span><span class="s0">in </span><span class="s1">iframe</span><span class="s2">[</span><span class="s4">'src'</span><span class="s2">] </span><span class="s0">or </span><span class="s1">self</span><span class="s2">.</span><span class="s1">domain </span><span class="s0">in </span><span class="s1">iframe</span><span class="s2">[</span><span class="s4">'src'</span><span class="s2">] </span><span class="s0">or </span><span class="s1">len</span><span class="s2">(</span><span class="s1">dots</span><span class="s2">) == </span><span class="s5">1</span><span class="s2">:</span>
+                    <span class="s1">success </span><span class="s2">= </span><span class="s1">success </span><span class="s2">+ </span><span class="s5">1</span>
+                <span class="s1">i </span><span class="s2">= </span><span class="s1">i</span><span class="s2">+</span><span class="s5">1</span>
+
+            <span class="s0">try</span><span class="s2">:</span>
+                <span class="s1">percentage </span><span class="s2">= </span><span class="s1">success</span><span class="s2">/</span><span class="s1">float</span><span class="s2">(</span><span class="s1">i</span><span class="s2">) * </span><span class="s5">100</span>
+                <span class="s0">if </span><span class="s1">percentage </span><span class="s2">&lt; </span><span class="s5">22.0</span><span class="s2">:</span>
+                    <span class="s0">return </span><span class="s5">1</span>
+                <span class="s0">elif</span><span class="s2">((</span><span class="s1">percentage </span><span class="s2">&gt;= </span><span class="s5">22.0</span><span class="s2">) </span><span class="s0">and </span><span class="s2">(</span><span class="s1">percentage </span><span class="s2">&lt; </span><span class="s5">61.0</span><span class="s2">)):</span>
+                    <span class="s0">return </span><span class="s5">0</span>
+                <span class="s0">else</span><span class="s2">:</span>
+                    <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+            <span class="s0">except</span><span class="s2">:</span>
+                <span class="s0">return </span><span class="s5">0</span>
+        <span class="s0">except</span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+    
+    <span class="s3"># 14. AnchorURL</span>
+    <span class="s0">def </span><span class="s1">AnchorURL</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s1">i</span><span class="s2">,</span><span class="s1">unsafe </span><span class="s2">= </span><span class="s5">0</span><span class="s2">,</span><span class="s5">0</span>
+            <span class="s0">for </span><span class="s1">a </span><span class="s0">in </span><span class="s1">self</span><span class="s2">.</span><span class="s1">soup</span><span class="s2">.</span><span class="s1">find_all</span><span class="s2">(</span><span class="s4">'a'</span><span class="s2">, </span><span class="s1">href</span><span class="s2">=</span><span class="s0">True</span><span class="s2">):</span>
+                <span class="s0">if </span><span class="s4">&quot;#&quot; </span><span class="s0">in </span><span class="s1">a</span><span class="s2">[</span><span class="s4">'href'</span><span class="s2">] </span><span class="s0">or </span><span class="s4">&quot;javascript&quot; </span><span class="s0">in </span><span class="s1">a</span><span class="s2">[</span><span class="s4">'href'</span><span class="s2">].</span><span class="s1">lower</span><span class="s2">() </span><span class="s0">or </span><span class="s4">&quot;mailto&quot; </span><span class="s0">in </span><span class="s1">a</span><span class="s2">[</span><span class="s4">'href'</span><span class="s2">].</span><span class="s1">lower</span><span class="s2">() </span><span class="s0">or not </span><span class="s2">(</span><span class="s1">url </span><span class="s0">in </span><span class="s1">a</span><span class="s2">[</span><span class="s4">'href'</span><span class="s2">] </span><span class="s0">or </span><span class="s1">self</span><span class="s2">.</span><span class="s1">domain </span><span class="s0">in </span><span class="s1">a</span><span class="s2">[</span><span class="s4">'href'</span><span class="s2">]):</span>
+                    <span class="s1">unsafe </span><span class="s2">= </span><span class="s1">unsafe </span><span class="s2">+ </span><span class="s5">1</span>
+                <span class="s1">i </span><span class="s2">= </span><span class="s1">i </span><span class="s2">+ </span><span class="s5">1</span>
+
+            <span class="s0">try</span><span class="s2">:</span>
+                <span class="s1">percentage </span><span class="s2">= </span><span class="s1">unsafe </span><span class="s2">/ </span><span class="s1">float</span><span class="s2">(</span><span class="s1">i</span><span class="s2">) * </span><span class="s5">100</span>
+                <span class="s0">if </span><span class="s1">percentage </span><span class="s2">&lt; </span><span class="s5">31.0</span><span class="s2">:</span>
+                    <span class="s0">return </span><span class="s5">1</span>
+                <span class="s0">elif </span><span class="s2">((</span><span class="s1">percentage </span><span class="s2">&gt;= </span><span class="s5">31.0</span><span class="s2">) </span><span class="s0">and </span><span class="s2">(</span><span class="s1">percentage </span><span class="s2">&lt; </span><span class="s5">67.0</span><span class="s2">)):</span>
+                    <span class="s0">return </span><span class="s5">0</span>
+                <span class="s0">else</span><span class="s2">:</span>
+                    <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+            <span class="s0">except</span><span class="s2">:</span>
+                <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+
+        <span class="s0">except</span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+
+    <span class="s3"># 15. LinksInScriptTags</span>
+    <span class="s0">def </span><span class="s1">LinksInScriptTags</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s1">i</span><span class="s2">,</span><span class="s1">success </span><span class="s2">= </span><span class="s5">0</span><span class="s2">,</span><span class="s5">0</span>
+        
+            <span class="s0">for </span><span class="s1">link </span><span class="s0">in </span><span class="s1">self</span><span class="s2">.</span><span class="s1">soup</span><span class="s2">.</span><span class="s1">find_all</span><span class="s2">(</span><span class="s4">'link'</span><span class="s2">, </span><span class="s1">href</span><span class="s2">=</span><span class="s0">True</span><span class="s2">):</span>
+                <span class="s1">dots </span><span class="s2">= [</span><span class="s1">x</span><span class="s2">.</span><span class="s1">start</span><span class="s2">(</span><span class="s5">0</span><span class="s2">) </span><span class="s0">for </span><span class="s1">x </span><span class="s0">in </span><span class="s1">re</span><span class="s2">.</span><span class="s1">finditer</span><span class="s2">(</span><span class="s4">'\.'</span><span class="s2">, </span><span class="s1">link</span><span class="s2">[</span><span class="s4">'href'</span><span class="s2">])]</span>
+                <span class="s0">if </span><span class="s1">self</span><span class="s2">.</span><span class="s1">url </span><span class="s0">in </span><span class="s1">link</span><span class="s2">[</span><span class="s4">'href'</span><span class="s2">] </span><span class="s0">or </span><span class="s1">self</span><span class="s2">.</span><span class="s1">domain </span><span class="s0">in </span><span class="s1">link</span><span class="s2">[</span><span class="s4">'href'</span><span class="s2">] </span><span class="s0">or </span><span class="s1">len</span><span class="s2">(</span><span class="s1">dots</span><span class="s2">) == </span><span class="s5">1</span><span class="s2">:</span>
+                    <span class="s1">success </span><span class="s2">= </span><span class="s1">success </span><span class="s2">+ </span><span class="s5">1</span>
+                <span class="s1">i </span><span class="s2">= </span><span class="s1">i</span><span class="s2">+</span><span class="s5">1</span>
+
+            <span class="s0">for </span><span class="s1">script </span><span class="s0">in </span><span class="s1">self</span><span class="s2">.</span><span class="s1">soup</span><span class="s2">.</span><span class="s1">find_all</span><span class="s2">(</span><span class="s4">'script'</span><span class="s2">, </span><span class="s1">src</span><span class="s2">=</span><span class="s0">True</span><span class="s2">):</span>
+                <span class="s1">dots </span><span class="s2">= [</span><span class="s1">x</span><span class="s2">.</span><span class="s1">start</span><span class="s2">(</span><span class="s5">0</span><span class="s2">) </span><span class="s0">for </span><span class="s1">x </span><span class="s0">in </span><span class="s1">re</span><span class="s2">.</span><span class="s1">finditer</span><span class="s2">(</span><span class="s4">'\.'</span><span class="s2">, </span><span class="s1">script</span><span class="s2">[</span><span class="s4">'src'</span><span class="s2">])]</span>
+                <span class="s0">if </span><span class="s1">self</span><span class="s2">.</span><span class="s1">url </span><span class="s0">in </span><span class="s1">script</span><span class="s2">[</span><span class="s4">'src'</span><span class="s2">] </span><span class="s0">or </span><span class="s1">self</span><span class="s2">.</span><span class="s1">domain </span><span class="s0">in </span><span class="s1">script</span><span class="s2">[</span><span class="s4">'src'</span><span class="s2">] </span><span class="s0">or </span><span class="s1">len</span><span class="s2">(</span><span class="s1">dots</span><span class="s2">) == </span><span class="s5">1</span><span class="s2">:</span>
+                    <span class="s1">success </span><span class="s2">= </span><span class="s1">success </span><span class="s2">+ </span><span class="s5">1</span>
+                <span class="s1">i </span><span class="s2">= </span><span class="s1">i</span><span class="s2">+</span><span class="s5">1</span>
+
+            <span class="s0">try</span><span class="s2">:</span>
+                <span class="s1">percentage </span><span class="s2">= </span><span class="s1">success </span><span class="s2">/ </span><span class="s1">float</span><span class="s2">(</span><span class="s1">i</span><span class="s2">) * </span><span class="s5">100</span>
+                <span class="s0">if </span><span class="s1">percentage </span><span class="s2">&lt; </span><span class="s5">17.0</span><span class="s2">:</span>
+                    <span class="s0">return </span><span class="s5">1</span>
+                <span class="s0">elif</span><span class="s2">((</span><span class="s1">percentage </span><span class="s2">&gt;= </span><span class="s5">17.0</span><span class="s2">) </span><span class="s0">and </span><span class="s2">(</span><span class="s1">percentage </span><span class="s2">&lt; </span><span class="s5">81.0</span><span class="s2">)):</span>
+                    <span class="s0">return </span><span class="s5">0</span>
+                <span class="s0">else</span><span class="s2">:</span>
+                    <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+            <span class="s0">except</span><span class="s2">:</span>
+                <span class="s0">return </span><span class="s5">0</span>
+        <span class="s0">except</span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+
+    <span class="s3"># 16. ServerFormHandler</span>
+    <span class="s0">def </span><span class="s1">ServerFormHandler</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s0">if </span><span class="s1">len</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">soup</span><span class="s2">.</span><span class="s1">find_all</span><span class="s2">(</span><span class="s4">'form'</span><span class="s2">, </span><span class="s1">action</span><span class="s2">=</span><span class="s0">True</span><span class="s2">))==</span><span class="s5">0</span><span class="s2">:</span>
+                <span class="s0">return </span><span class="s5">1</span>
+            <span class="s0">else </span><span class="s2">:</span>
+                <span class="s0">for </span><span class="s1">form </span><span class="s0">in </span><span class="s1">self</span><span class="s2">.</span><span class="s1">soup</span><span class="s2">.</span><span class="s1">find_all</span><span class="s2">(</span><span class="s4">'form'</span><span class="s2">, </span><span class="s1">action</span><span class="s2">=</span><span class="s0">True</span><span class="s2">):</span>
+                    <span class="s0">if </span><span class="s1">form</span><span class="s2">[</span><span class="s4">'action'</span><span class="s2">] == </span><span class="s4">&quot;&quot; </span><span class="s0">or </span><span class="s1">form</span><span class="s2">[</span><span class="s4">'action'</span><span class="s2">] == </span><span class="s4">&quot;about:blank&quot;</span><span class="s2">:</span>
+                        <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+                    <span class="s0">elif </span><span class="s1">self</span><span class="s2">.</span><span class="s1">url </span><span class="s0">not in </span><span class="s1">form</span><span class="s2">[</span><span class="s4">'action'</span><span class="s2">] </span><span class="s0">and </span><span class="s1">self</span><span class="s2">.</span><span class="s1">domain </span><span class="s0">not in </span><span class="s1">form</span><span class="s2">[</span><span class="s4">'action'</span><span class="s2">]:</span>
+                        <span class="s0">return </span><span class="s5">0</span>
+                    <span class="s0">else</span><span class="s2">:</span>
+                        <span class="s0">return </span><span class="s5">1</span>
+        <span class="s0">except</span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+
+    <span class="s3"># 17. InfoEmail</span>
+    <span class="s0">def </span><span class="s1">InfoEmail</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s0">if </span><span class="s1">re</span><span class="s2">.</span><span class="s1">findall</span><span class="s2">(</span><span class="s4">r&quot;[mail\(\)|mailto:?]&quot;</span><span class="s2">, </span><span class="s1">self</span><span class="s2">.</span><span class="s1">soap</span><span class="s2">):</span>
+                <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+            <span class="s0">else</span><span class="s2">:</span>
+                <span class="s0">return </span><span class="s5">1</span>
+        <span class="s0">except</span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+
+    <span class="s3"># 18. AbnormalURL</span>
+    <span class="s0">def </span><span class="s1">AbnormalURL</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s0">if </span><span class="s1">self</span><span class="s2">.</span><span class="s1">response</span><span class="s2">.</span><span class="s1">text </span><span class="s2">== </span><span class="s1">self</span><span class="s2">.</span><span class="s1">whois_response</span><span class="s2">:</span>
+                <span class="s0">return </span><span class="s5">1</span>
+            <span class="s0">else</span><span class="s2">:</span>
+                <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+        <span class="s0">except</span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+
+    <span class="s3"># 19. WebsiteForwarding</span>
+    <span class="s0">def </span><span class="s1">WebsiteForwarding</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s0">if </span><span class="s1">len</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">response</span><span class="s2">.</span><span class="s1">history</span><span class="s2">) &lt;= </span><span class="s5">1</span><span class="s2">:</span>
+                <span class="s0">return </span><span class="s5">1</span>
+            <span class="s0">elif </span><span class="s1">len</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">response</span><span class="s2">.</span><span class="s1">history</span><span class="s2">) &lt;= </span><span class="s5">4</span><span class="s2">:</span>
+                <span class="s0">return </span><span class="s5">0</span>
+            <span class="s0">else</span><span class="s2">:</span>
+                <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+        <span class="s0">except</span><span class="s2">:</span>
+             <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+
+    <span class="s3"># 20. StatusBarCust</span>
+    <span class="s0">def </span><span class="s1">StatusBarCust</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s0">if </span><span class="s1">re</span><span class="s2">.</span><span class="s1">findall</span><span class="s2">(</span><span class="s4">&quot;&lt;script&gt;.+onmouseover.+&lt;/script&gt;&quot;</span><span class="s2">, </span><span class="s1">self</span><span class="s2">.</span><span class="s1">response</span><span class="s2">.</span><span class="s1">text</span><span class="s2">):</span>
+                <span class="s0">return </span><span class="s5">1</span>
+            <span class="s0">else</span><span class="s2">:</span>
+                <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+        <span class="s0">except</span><span class="s2">:</span>
+             <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+
+    <span class="s3"># 21. DisableRightClick</span>
+    <span class="s0">def </span><span class="s1">DisableRightClick</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s0">if </span><span class="s1">re</span><span class="s2">.</span><span class="s1">findall</span><span class="s2">(</span><span class="s4">r&quot;event.button ?== ?2&quot;</span><span class="s2">, </span><span class="s1">self</span><span class="s2">.</span><span class="s1">response</span><span class="s2">.</span><span class="s1">text</span><span class="s2">):</span>
+                <span class="s0">return </span><span class="s5">1</span>
+            <span class="s0">else</span><span class="s2">:</span>
+                <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+        <span class="s0">except</span><span class="s2">:</span>
+             <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+
+    <span class="s3"># 22. UsingPopupWindow</span>
+    <span class="s0">def </span><span class="s1">UsingPopupWindow</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s0">if </span><span class="s1">re</span><span class="s2">.</span><span class="s1">findall</span><span class="s2">(</span><span class="s4">r&quot;alert\(&quot;</span><span class="s2">, </span><span class="s1">self</span><span class="s2">.</span><span class="s1">response</span><span class="s2">.</span><span class="s1">text</span><span class="s2">):</span>
+                <span class="s0">return </span><span class="s5">1</span>
+            <span class="s0">else</span><span class="s2">:</span>
+                <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+        <span class="s0">except</span><span class="s2">:</span>
+             <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+
+    <span class="s3"># 23. IframeRedirection</span>
+    <span class="s0">def </span><span class="s1">IframeRedirection</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s0">if </span><span class="s1">re</span><span class="s2">.</span><span class="s1">findall</span><span class="s2">(</span><span class="s4">r&quot;[&lt;iframe&gt;|&lt;frameBorder&gt;]&quot;</span><span class="s2">, </span><span class="s1">self</span><span class="s2">.</span><span class="s1">response</span><span class="s2">.</span><span class="s1">text</span><span class="s2">):</span>
+                <span class="s0">return </span><span class="s5">1</span>
+            <span class="s0">else</span><span class="s2">:</span>
+                <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+        <span class="s0">except</span><span class="s2">:</span>
+             <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+
+    <span class="s3"># 24. AgeofDomain</span>
+    <span class="s0">def </span><span class="s1">AgeofDomain</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s1">creation_date </span><span class="s2">= </span><span class="s1">self</span><span class="s2">.</span><span class="s1">whois_response</span><span class="s2">.</span><span class="s1">creation_date</span>
+            <span class="s0">try</span><span class="s2">:</span>
+                <span class="s0">if</span><span class="s2">(</span><span class="s1">len</span><span class="s2">(</span><span class="s1">creation_date</span><span class="s2">)):</span>
+                    <span class="s1">creation_date </span><span class="s2">= </span><span class="s1">creation_date</span><span class="s2">[</span><span class="s5">0</span><span class="s2">]</span>
+            <span class="s0">except</span><span class="s2">:</span>
+                <span class="s0">pass</span>
+
+            <span class="s1">today  </span><span class="s2">= </span><span class="s1">date</span><span class="s2">.</span><span class="s1">today</span><span class="s2">()</span>
+            <span class="s1">age </span><span class="s2">= (</span><span class="s1">today</span><span class="s2">.</span><span class="s1">year</span><span class="s2">-</span><span class="s1">creation_date</span><span class="s2">.</span><span class="s1">year</span><span class="s2">)*</span><span class="s5">12</span><span class="s2">+(</span><span class="s1">today</span><span class="s2">.</span><span class="s1">month</span><span class="s2">-</span><span class="s1">creation_date</span><span class="s2">.</span><span class="s1">month</span><span class="s2">)</span>
+            <span class="s0">if </span><span class="s1">age </span><span class="s2">&gt;=</span><span class="s5">6</span><span class="s2">:</span>
+                <span class="s0">return </span><span class="s5">1</span>
+            <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+        <span class="s0">except</span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+
+    <span class="s3"># 25. DNSRecording    </span>
+    <span class="s0">def </span><span class="s1">DNSRecording</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s1">creation_date </span><span class="s2">= </span><span class="s1">self</span><span class="s2">.</span><span class="s1">whois_response</span><span class="s2">.</span><span class="s1">creation_date</span>
+            <span class="s0">try</span><span class="s2">:</span>
+                <span class="s0">if</span><span class="s2">(</span><span class="s1">len</span><span class="s2">(</span><span class="s1">creation_date</span><span class="s2">)):</span>
+                    <span class="s1">creation_date </span><span class="s2">= </span><span class="s1">creation_date</span><span class="s2">[</span><span class="s5">0</span><span class="s2">]</span>
+            <span class="s0">except</span><span class="s2">:</span>
+                <span class="s0">pass</span>
+
+            <span class="s1">today  </span><span class="s2">= </span><span class="s1">date</span><span class="s2">.</span><span class="s1">today</span><span class="s2">()</span>
+            <span class="s1">age </span><span class="s2">= (</span><span class="s1">today</span><span class="s2">.</span><span class="s1">year</span><span class="s2">-</span><span class="s1">creation_date</span><span class="s2">.</span><span class="s1">year</span><span class="s2">)*</span><span class="s5">12</span><span class="s2">+(</span><span class="s1">today</span><span class="s2">.</span><span class="s1">month</span><span class="s2">-</span><span class="s1">creation_date</span><span class="s2">.</span><span class="s1">month</span><span class="s2">)</span>
+            <span class="s0">if </span><span class="s1">age </span><span class="s2">&gt;=</span><span class="s5">6</span><span class="s2">:</span>
+                <span class="s0">return </span><span class="s5">1</span>
+            <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+        <span class="s0">except</span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+
+    <span class="s3"># 26. WebsiteTraffic   </span>
+    <span class="s0">def </span><span class="s1">WebsiteTraffic</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s1">rank </span><span class="s2">= </span><span class="s1">BeautifulSoup</span><span class="s2">(</span><span class="s1">urllib</span><span class="s2">.</span><span class="s1">request</span><span class="s2">.</span><span class="s1">urlopen</span><span class="s2">(</span><span class="s4">&quot;http://data.alexa.com/data?cli=10&amp;dat=s&amp;url=&quot; </span><span class="s2">+ </span><span class="s1">url</span><span class="s2">).</span><span class="s1">read</span><span class="s2">(), </span><span class="s4">&quot;xml&quot;</span><span class="s2">).</span><span class="s1">find</span><span class="s2">(</span><span class="s4">&quot;REACH&quot;</span><span class="s2">)[</span><span class="s4">'RANK'</span><span class="s2">]</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">int</span><span class="s2">(</span><span class="s1">rank</span><span class="s2">) &lt; </span><span class="s5">100000</span><span class="s2">):</span>
+                <span class="s0">return </span><span class="s5">1</span>
+            <span class="s0">return </span><span class="s5">0</span>
+        <span class="s0">except </span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+
+    <span class="s3"># 27. PageRank</span>
+    <span class="s0">def </span><span class="s1">PageRank</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s1">prank_checker_response </span><span class="s2">= </span><span class="s1">requests</span><span class="s2">.</span><span class="s1">post</span><span class="s2">(</span><span class="s4">&quot;https://www.checkpagerank.net/index.php&quot;</span><span class="s2">, {</span><span class="s4">&quot;name&quot;</span><span class="s2">: </span><span class="s1">self</span><span class="s2">.</span><span class="s1">domain</span><span class="s2">})</span>
+
+            <span class="s1">global_rank </span><span class="s2">= </span><span class="s1">int</span><span class="s2">(</span><span class="s1">re</span><span class="s2">.</span><span class="s1">findall</span><span class="s2">(</span><span class="s4">r&quot;Global Rank: ([0-9]+)&quot;</span><span class="s2">, </span><span class="s1">rank_checker_response</span><span class="s2">.</span><span class="s1">text</span><span class="s2">)[</span><span class="s5">0</span><span class="s2">])</span>
+            <span class="s0">if </span><span class="s1">global_rank </span><span class="s2">&gt; </span><span class="s5">0 </span><span class="s0">and </span><span class="s1">global_rank </span><span class="s2">&lt; </span><span class="s5">100000</span><span class="s2">:</span>
+                <span class="s0">return </span><span class="s5">1</span>
+            <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+        <span class="s0">except</span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+            
+
+    <span class="s3"># 28. GoogleIndex</span>
+    <span class="s0">def </span><span class="s1">GoogleIndex</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s1">site </span><span class="s2">= </span><span class="s1">search</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">url</span><span class="s2">, </span><span class="s5">5</span><span class="s2">)</span>
+            <span class="s0">if </span><span class="s1">site</span><span class="s2">:</span>
+                <span class="s0">return </span><span class="s5">1</span>
+            <span class="s0">else</span><span class="s2">:</span>
+                <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+        <span class="s0">except</span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s5">1</span>
+
+    <span class="s3"># 29. LinksPointingToPage</span>
+    <span class="s0">def </span><span class="s1">LinksPointingToPage</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s1">number_of_links </span><span class="s2">= </span><span class="s1">len</span><span class="s2">(</span><span class="s1">re</span><span class="s2">.</span><span class="s1">findall</span><span class="s2">(</span><span class="s4">r&quot;&lt;a href=&quot;</span><span class="s2">, </span><span class="s1">self</span><span class="s2">.</span><span class="s1">response</span><span class="s2">.</span><span class="s1">text</span><span class="s2">))</span>
+            <span class="s0">if </span><span class="s1">number_of_links </span><span class="s2">== </span><span class="s5">0</span><span class="s2">:</span>
+                <span class="s0">return </span><span class="s5">1</span>
+            <span class="s0">elif </span><span class="s1">number_of_links </span><span class="s2">&lt;= </span><span class="s5">2</span><span class="s2">:</span>
+                <span class="s0">return </span><span class="s5">0</span>
+            <span class="s0">else</span><span class="s2">:</span>
+                <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+        <span class="s0">except</span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+
+    <span class="s3"># 30. StatsReport</span>
+    <span class="s0">def </span><span class="s1">StatsReport</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s1">url_match </span><span class="s2">= </span><span class="s1">re</span><span class="s2">.</span><span class="s1">search</span><span class="s2">(</span>
+        <span class="s4">'at\.ua|usa\.cc|baltazarpresentes\.com\.br|pe\.hu|esy\.es|hol\.es|sweddy\.com|myjino\.ru|96\.lt|ow\.ly'</span><span class="s2">, </span><span class="s1">url</span><span class="s2">)</span>
+            <span class="s1">ip_address </span><span class="s2">= </span><span class="s1">socket</span><span class="s2">.</span><span class="s1">gethostbyname</span><span class="s2">(</span><span class="s1">self</span><span class="s2">.</span><span class="s1">domain</span><span class="s2">)</span>
+            <span class="s1">ip_match </span><span class="s2">= </span><span class="s1">re</span><span class="s2">.</span><span class="s1">search</span><span class="s2">(</span><span class="s4">'146\.112\.61\.108|213\.174\.157\.151|121\.50\.168\.88|192\.185\.217\.116|78\.46\.211\.158|181\.174\.165\.13|46\.242\.145\.103|121\.50\.168\.40|83\.125\.22\.219|46\.242\.145\.98|'</span>
+                                <span class="s4">'107\.151\.148\.44|107\.151\.148\.107|64\.70\.19\.203|199\.184\.144\.27|107\.151\.148\.108|107\.151\.148\.109|119\.28\.52\.61|54\.83\.43\.69|52\.69\.166\.231|216\.58\.192\.225|'</span>
+                                <span class="s4">'118\.184\.25\.86|67\.208\.74\.71|23\.253\.126\.58|104\.239\.157\.210|175\.126\.123\.219|141\.8\.224\.221|10\.10\.10\.10|43\.229\.108\.32|103\.232\.215\.140|69\.172\.201\.153|'</span>
+                                <span class="s4">'216\.218\.185\.162|54\.225\.104\.146|103\.243\.24\.98|199\.59\.243\.120|31\.170\.160\.61|213\.19\.128\.77|62\.113\.226\.131|208\.100\.26\.234|195\.16\.127\.102|195\.16\.127\.157|'</span>
+                                <span class="s4">'34\.196\.13\.28|103\.224\.212\.222|172\.217\.4\.225|54\.72\.9\.51|192\.64\.147\.141|198\.200\.56\.183|23\.253\.164\.103|52\.48\.191\.26|52\.214\.197\.72|87\.98\.255\.18|209\.99\.17\.27|'</span>
+                                <span class="s4">'216\.38\.62\.18|104\.130\.124\.96|47\.89\.58\.141|78\.46\.211\.158|54\.86\.225\.156|54\.82\.156\.19|37\.157\.192\.102|204\.11\.56\.48|110\.34\.231\.42'</span><span class="s2">, </span><span class="s1">ip_address</span><span class="s2">)</span>
+            <span class="s0">if </span><span class="s1">url_match</span><span class="s2">:</span>
+                <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+            <span class="s0">elif </span><span class="s1">ip_match</span><span class="s2">:</span>
+                <span class="s0">return </span><span class="s2">-</span><span class="s5">1</span>
+            <span class="s0">return </span><span class="s5">1</span>
+        <span class="s0">except</span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s5">1</span>
+    
+    <span class="s0">def </span><span class="s1">getFeaturesList</span><span class="s2">(</span><span class="s1">self</span><span class="s2">):</span>
+        <span class="s0">return </span><span class="s1">self</span><span class="s2">.</span><span class="s1">features</span>
+</pre>
+</body>
+</html>

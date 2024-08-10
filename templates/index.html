@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SafeWeb</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css" integrity="sha384-b6lVK+yci+bfDmaY1u0zE8YYJt0TZxLEAFyYSLHId4xoVvsrQu3INevFKo+Xir8e" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <!-- Google fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cabin&family=Poppins:wght@100;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- <link rel="stylesheet" type="text/css" href="styles.css"> -->
+    <link href="static/style.css" rel="stylesheet">
+
+</head>
+<body class=" vh-100 over home">
+    
+<!-- Navbar -->
+<navbar-expand-lg class="navbar navbar-expand-lg navbar-dark bg-dark py-3 fixed-top">
+    <div class="container font-monospace">
+        <a href="index" class="navbar-brand text-warning">PhishDetect</a>
+        <!-- For smaller screens -->
+        <button 
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navmenu"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>         
+        <div class="collapse navbar-collapse" id="navmenu">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a href="index" class="nav-link">Home</a>
+
+                </li>
+                <li class="nav-item">
+                    <a href="#intro" class="nav-link">Introduction</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#types" class="nav-link">Types</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#precautions" class="nav-link">Precautions</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#about" class="nav-link">About</a>
+                </li>
+
+                
+            </ul>
+        </div>
+    </div>
+</navbar-expand-lg>
+<!-- Navbar ends-->
+
+<!-- Home Section Starts -->
+<section class="bg-transparent text-light px-5 text-center">
+    <div class="container mt-5 p-5 ">
+
+        <div class="p-5">
+            <div class="font-monospace m-5 h1 size">Welcome to <span class="text-warning">PhishDetect</span>!</div>
+            <h3 class="font-monospace mt-5">This website helps you to detect and prevent Phishing websites by using ML Algorithm</h3>
+            <div class="m-5">
+                <a href="#intro">
+                    <button class="btn btn-outline-light btn-lg m-5">Know more About <br> Phishing</button>
+                </a> 
+                <a href="/error">
+                    <button class="btn btn-outline-light btn-lg m-5">Check Phishing <br> websites using url</button>
+                </a> 
+            </div>
+        </div>
+    </div>
+    
+</section>
+<!-- Home Section Ends -->
+
+
+
+<!-- Introduction section start -->
+<section id="intro">
+    <div class="container mt-5 pt-5">
+        <h1 class="font-monospace text-center mt-5 pt-5">Introduction to Phishing</h1>
+        <div class="row align-items-center justify-content-between">
+            <div class="col-md">
+                <img src={{ url_for('static', filename='img/attack.jpg') }} class="img-fluid my-img" alt="">
+            </div>
+            <div class="col-md pt-5">
+                <h5 class="text-primary">What is Phishing</h5>
+                <h2>Making it count one detection at a time</h2>
+                <p class="lead">
+                    Phishing is a cybercrime in which a target or targets are contacted by email, telephone or text message by someone posing as a legitimate institution to lure individuals into providing sensitive data such as personally identifiable information, banking and credit card details, and passwords.
+                </p>
+                <p>Sometimes attackers are satisfied with getting a victim's credit card information or other personal data for financial gain. Other times, phishing emails are sent to obtain employee login information or other details for use in an advanced attack against a specific company. Cybercrime attacks such as advanced persistent threats (APTs) and ransomware often start with phishing.
+                </p>
+                <a href="https://www.cisco.com/c/en_in/products/security/email-security/what-is-phishing.html" class="btn btn-light mt-3">
+                   <i class="bi bi-chevron-right"></i>  Read More
+                </a>
+
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Introduction section end -->
+
+
+<!-- Types section start -->
+<section id="types" class="bg-dark text-light">
+    <div class="container font-monospace mt-3">
+
+      <div class="row">
+
+        <div class="col-lg-4 offset-lg-4">
+          <div class="section-header">
+            <h1 class="font-monospace text-center mt-3 pt-4 pb-5">Types of Phishing</h1>
+            <span class="section-divider"></span>
+          </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-lg-4 col-md-6" style="padding-bottom: 50px;">
+                <h3 >HTTPS Phishing</h3>
+                <p class="descript">An HTTPS phishing attack is carried out by sending the victim an email with a link to a fake website. The site may then be used to fool the victim into entering their private information.</p>
+                <a href="https://www.keyfactor.com/blog/https-phishing-attacks-how-hackers-use-ssl-certificates-to-feign-trust/"><button class="btn btn-outline-light btn-lg">Know more</button></a>
+            </div>
+            <div class="col-lg-4 col-md-6" style="padding-bottom: 50px;">
+                <h3>Pharming</h3>
+                <p class="descript">In a pharming attack, the victim gets malicious code installed on their computer. This code then sends the victim to a fake website designed to gather their login credentials</p>
+                <a href="https://www.kaspersky.com/resource-center/definitions/pharming"><button class="btn btn-outline-light btn-lg">Know more</button></a>
+            </div>
+            <div class="col-lg-4 col-md-6" style="padding-bottom: 50px;">
+                <h3>Pop-up Phishing</h3>
+                <p class="descript">Pop-up phishing often uses a pop-up about a problem with your computer's security or some other issue to trick you into clicking. You are then directed to download a file, which ends up being malware, or to call what is supposed to be a support center.</p>
+                <a href="https://www.aboutschwab.com/identifying-and-avoiding-fraudulent-pop-ups"><button class="btn btn-outline-light btn-lg">Know more</button></a>
+            </div>
+            <div class="col-lg-4 col-md-6" style="padding-bottom: 50px;">
+                <h3>Clone Phishing</h3>
+                <p class="descript">A clone phishing attack involves a hacker making an identical copy of a message the recipient already received. They may include something like “resending this” and put a malicious link in the email.</p>
+                <a href="https://www.proofpoint.com/us/threat-reference/clone-phishing"><button class="btn btn-outline-light btn-lg">Know more</button></a>
+            </div>
+            <div class="col-lg-4 col-md-6" style="padding-bottom: 50px;">
+                <h3>Deceptive Phishing</h3>
+                <p class="descript">Deceptive phishers use deceptive technology to pretend they are with a real company to inform the targets they are already experiencing a cyberattack. The users then click on a malicious link, infecting their computer.</p>
+                <a href="https://www.researchgate.net/figure/steps-in-a-deceptive-phishing-attack_fig1_224602500"><button class="btn btn-outline-light btn-lg">Know more</button></a>
+            </div>
+            <div class="col-lg-4 col-md-6" style="padding-bottom: 50px;">
+                <h3>Social Engineering</h3>
+                <p class="descript">Social engineering attacks pressure someone into revealing sensitive information by manipulating them psychologically.</p>
+                <a href="https://www.imperva.com/learn/application-security/social-engineering-attack/"><button class="btn btn-outline-light btn-lg">Know more</button></a>
+            </div>
+            
+         </div>
+
+        
+
+    </div>
+</section>
+<!-- Types section end -->
+
+
+<!-- Precaution section start-->
+<section id="precautions" class="p-5">
+    <div class="container">
+        <h1 class="font-monospace text-center">How To Protect Yourself From Phishing Attacks</h1>
+        <div class="row align-items-center justify-content-between">
+            
+            <div class="col-md p-5">
+                <h5 class="text-primary">Four Ways To Protect Yourself From Phishing</h5>
+                
+                <p>
+                    <ol>
+                        <li><b>Protect your computer by using security software.</b>Set the software to update automatically so it will deal with any new security threats. </li> 
+
+                        <li><b>Protect your cell phone by setting software to update automatically.</b> These updates could give you critical protection against security threats.</li> 
+
+                        <li><b>Protect your accounts by using multi-factor authentication.</b> Some accounts offer extra security by requiring two or more credentials to log in to your account. This is called multi-factor authentication</li> 
+
+                        <li><b>Protect your data by backing it up.</b>Back up the data on your computer to an external hard drive or in the cloud. Back up the data on your phone, too.</li> 
+
+                    </ol>
+                </p>
+                <a href="https://consumer.ftc.gov/articles/how-recognize-and-avoid-phishing-scams"><button class="btn btn-outline-primary btn-lg">Know more</button></a>
+                
+               
+
+            </div>
+            <div class="col-md my-img-1">
+                <img src={{ url_for('static', filename='img/precaution.jpg') }} class="img-fluid my-img-1" alt="">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Precaution section end-->
+
+
+<!-- About section start -->
+<section id="about" class="bg-dark">
+    <div class="container mt-5 pt-5 text-light">
+        <h1 class="font-monospace text-center">About SafeWeb</h1>
+        <div class="row align-items-center justify-content-between">
+            <div class="col-md">
+                <img src={{ url_for('static', filename='img/phishing.png') }} class="img-fluid mb-3" alt="">
+               
+            </div>
+            
+            <div class="col-md p-5">
+                <h5 class="text-primary">How SafeWeb Works</h5>
+                <h2>How Aware uses Machine Learning to detect and prevent Phishing Websites</h2>
+                <ul>
+                    <li><strong>Project Objective:</strong>The primary goal of this project is to develop a machine learning-based system that can effectively detect and prevent phishing websites (malicious websites designed to steal sensitive information) by analyzing their URLs.</li> <br>
+
+                    <li><strong>Data Source:</strong>The project uses a publicly available dataset from Kaggle, specifically the <a href="https://www.kaggle.com/datasets/eswarchandt/phishing-website-detector">"Phishing Website Detector"</a> dataset.This dataset contains various features extracted from URLs, including elements like the domain, path, and others, which will be used for training and testing the machine learning models.</li> <br>
+
+                    <li><strong>Machine Learning Algorithms:</strong>The project employs four machine learning algorithms:
+                  
+                        <ul><li>Gradient Boosting Classifier</li></ul>
+                        <ul><li>Random Forest</li></ul>
+                        <ul><li>Support Vector Machine (SVM)</li></ul>
+                        <ul><li>Decision tree</li></ul>
+                        <ul><li>Logistic Regression</li></ul>
+                        These algorithms are used to build predictive models that can classify URLs as either legitimate or phishing.</li> <br>
+
+                    <li><strong>Algorithm Performance:</strong>Among the four algorithms, the <strong class="text-warning">Gradient Boosting Classifier</strong> stands out with an impressive accuracy rate of <strong class="text-warning">97.4%.</strong>
+                        This classifier excels at identifying phishing URLs accurately, making it the primary choice for the project.</li> <br>
+
+                    <li><strong>Conclusion:</strong>This project effectively utilizes machine learning algorithms to detect and prevent phishing websites by analyzing their URLs. The Gradient Boosting Classifier, with its 97.4% accuracy, is the key component of the system, offering robust protection against phishing threats.</li> <br>
+                </ul>
+                <a href="#" class="btn btn-light mt-3">
+                   <i class="bi bi-chevron-right"></i>  Read More
+                </a>
+
+            </div>
+        </div>
+        <!-- <div class="col-md">
+            <img src="img/result-phishing.png" class="img-fluid align-middle my-img-2" alt="">
+        </div> -->
+    </div>
+</section>
+<!-- About section end -->
+
+</body>
+</html>
